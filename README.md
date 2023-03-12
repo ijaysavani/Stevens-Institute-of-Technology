@@ -7,15 +7,22 @@ Here is the list of assignments I have completed/inProcess during my ongoing Mas
 
 SPRING 2022
 AAI 551 - Engineering Programming: Python
+
 CS 513 - Knowledge Discovery and Data Mining
+
 CS 570 - Introduction to Programming, Data Structures, and Algorithms
+
 
 FALL 2022
 CS 550 - Computer Organization and Programming
+
 CS 561 - Database Management Systems I
+
 CS 573 - Fundamentals of CyberSecurity
 
 
+SPRING 2023
 CS 524 - Introduction to Cloud Computing
+
 CS 600 - Advanced Algorithm Design and Implementation
 
