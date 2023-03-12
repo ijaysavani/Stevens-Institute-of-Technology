@@ -1,0 +1,42 @@
+---
+title: "Savani_JayKalyanbhai_HW07"
+output: html_document
+date: '2022-04-20'
+---
+
+### KNOWLEDGE DISCOVERY AND DATA MINING (CS 513-A) ###
+# Course         : CS 513-A
+# First Name     : Jay Kalyanbhai 
+# Last Name      : Savani
+# Id             : 20009207
+rm(list=ls())
+name<-file.choose()
+a<-read.csv(name)
+View(a)
+
+a$diagnosis <- factor(a$diagnosis, levels = c('M','B'),labels = c(1,2))
+
+b<-sort(sample(nrow(a),as.integer(.70*nrow(a))))
+training_set<-a[b,]
+testing_set<-a[-b,]
+
+install.packages("neuralnet")
+
+library(neuralnet)
+
+modell<- neuralnet(diagnosis~.,training_set[-1], hidden=5, threshold=0.1)
+
+plot(modell)
+
+c<-compute(modell,testing_set)
+c$net.result 
+
+ccat<-ifelse(c$net.result <1.5,1,2)
+length(ccat)
+length(testing_set$diagnosis)
+
+d<-(testing_set$diagnosis!=ccat)
+errorrate<-sum(d)/length(d)
+errorrate
+
+

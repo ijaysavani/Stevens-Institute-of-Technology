@@ -1,0 +1,40 @@
+### KNOWLEDGE DISCOVERY AND DATA MINING (CS 513-A) ###
+# Course         : CS 513-A
+# First Name     : Jay Kalyanbhai 
+# Last Name      : Savani
+# Id             : 20009207
+rm(list=ls())
+name<-file.choose()
+a<-read.csv(name)
+View(a)
+a1<-subset(a,select=-c(id))
+View(a1)
+a1<-na.omit(a1)
+
+a1$diagnosis<-factor(a1$diagnosis,levels=c('M','B'),labels=c(1,2))
+
+a_dist<-dist(a1[,-1])
+hresult<-hclust(a_dist)
+plot(hresult)
+dev.off()
+a2<-cutree(hresult,2)
+table(a2,a[,1])
+
+#K Means#
+rm(list=ls())
+name<-file.choose()
+a<-read.csv(name)
+View(a)
+
+a1<-subset(a,select=-c(id))
+View(a1)
+a1<-na.omit(a1)
+
+a1$diagnosis<-factor(a1$diagnosis,levels=c('M','B'),labels=c(1,2))
+
+K2<- kmeans(a1[,-1],3,nstart = 10)
+K2$cluster
+K2$centers
+table(K2$cluster,a[,1])
+
+

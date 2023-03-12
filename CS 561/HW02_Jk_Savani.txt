@@ -1,0 +1,173 @@
+
+
+NAME - JAY KALYANBHAI SAVANI
+CWID - 20009207
+
+
+FINAL Q1
+
+with raw_data as 
+(select cust, prod,month, state, avg(quant) avg_q
+from sales
+group by cust,prod, month, state),
+
+raw_qnt_data as 
+(select s.cust, s.prod, s.month, s.state , s.quant from sales s ,raw_data rd1
+where s.cust = rd1.cust 
+and s.prod = rd1.prod
+and s.month = rd1.month
+and s.state = rd1.state),
+
+raw_p_data as 
+(select rd2.cust, rd2.prod, rd2.month ,rd2.state, avg(q1.quant) other_prod_avg
+from raw_data rd2 , raw_qnt_data as q1
+where rd2.cust = q1.cust
+and rd2.prod != q1.prod
+and rd2.month = q1.month
+and rd2.state = q1.state
+group by rd2.cust, rd2.prod, rd2.month ,rd2.state),
+
+raw_m_data as 
+(select rd3.cust, rd3.prod, rd3.month ,rd3.state, avg(q1.quant) other_month_avg
+from raw_data rd3 , raw_qnt_data as q1
+where rd3.cust = q1.cust
+and rd3.prod = q1.prod
+and rd3.month != q1.month
+and rd3.state = q1.state
+group by rd3.cust, rd3.prod, rd3.month ,rd3.state),
+
+raw_st_data as 
+(select rd4.cust, rd4.prod, rd4.month ,rd4.state, avg(q1.quant) other_st_avg
+from raw_data rd4 , raw_qnt_data as q1
+where rd4.cust = q1.cust
+and rd4.prod = q1.prod
+and rd4.month = q1.month
+and rd4.state != q1.state
+group by rd4.cust, rd4.prod, rd4.month ,rd4.state),
+
+raw_data2 as 
+(select rd5.cust,rd5.prod,rd5.month,rd5.state,rd5.avg_q, p1.other_prod_avg, m.other_month_avg 
+from raw_p_data p1,raw_m_data m,raw_data rd5
+where p1.cust = m.cust
+and m.cust = rd5.cust
+and p1.prod = m.prod
+and m.prod = rd5.prod
+and p1.month = m.month
+and m.month = rd5.month
+and p1.state = m.state
+and m.state = rd5.state)
+
+select rd2.cust customer, rd2.prod product, rd2.month, rd2.state, rd2.avg_q cust_avg, rd2.other_prod_avg, rd2.other_month_avg ,st2.other_st_avg other_state_avg 
+from raw_st_data st2 right outer join raw_data2 rd2
+on st2.cust = rd2.cust
+and st2.prod = rd2.prod
+and st2.month = rd2.month
+and st2.state = rd2.state;
+
+
+
+
+
+FINAL Q2
+
+
+with raw_data as
+(select cust,prod,state,month,avg(quant) avgq 
+from sales s 
+group by s.cust,prod,state,month),
+bf_data as 
+(select r1.cust, r1.prod, r1.state,r1.month, r1.avgq, r2.month bf_month, r2.avgq bfavg_q
+from raw_data r1 left outer join  raw_data r2
+on  r1.cust = r2.cust
+and r1.prod = r2.prod
+and r1.state = r2.state
+and r1.month = (r2.month +1)
+order by r1.cust,r1.prod,r1.month),
+af_data as 
+(select r1.cust, r1.prod, r1.state,r1.month, r1.avgq, r3.month aft_month, r3.avgq af_avg
+from raw_data r1 left outer join  raw_data r3
+on r1.cust = r3.cust
+and r1.prod = r3.prod
+and r1.state = r3.state
+and r1.month = (r3.month - 1)
+order by r1.cust,r1.prod,r1.month)
+select bf.cust customer, bf.prod product,bf.state, bf.month mo,bf.bfavg_q before_avg, af.af_avg af_avg
+from bf_data bf, af_data af 
+where  bf.cust = af.cust
+and  bf.prod = af.prod
+and bf.state = af.state
+and bf.month = af.month;
+
+
+
+
+FINAL Q3
+
+
+with raw_data as 
+(select r1.prod, count(rs1.quant) p ,r1.quant
+from sales r1, sales rs1
+where rs1.prod = r1.prod
+and r1.quant >= rs1.quant
+group by r1.prod, r1.quant
+order by r1.prod, r1.quant),
+
+raw_data2 as 
+(select r1.prod, round(count(r1.quant)/2.0) p1
+from sales r1
+group by r1.prod),
+
+raw_data3 as 
+(select r1.prod, r2.p 
+from raw_data2 r1, raw_data r2
+where r1.prod = r2.prod
+and r1.p1 <= r2.p),
+
+raw_data4 as
+(select rd.prod, min(p) min_p
+from raw_data3 rd
+group by rd.prod 
+order by rd.prod)
+
+select rd2.prod product, rd2.quant as "MEDIAN QUANT" 
+from raw_data4 r4,raw_data rd2
+where r4.prod = rd2.prod
+and r4.min_p = rd2.p;
+
+
+
+
+
+
+
+Final Q4
+
+
+with raw_data as
+(select r1.cust, r1.prod, sum(quant) tot 
+from sales r1
+group by r1.cust, prod),
+
+raw_monthly_data as
+(select r1.cust, r1.prod, r1.month, sum(r1.quant) rm_tot  
+from sales r1	
+group by r1.cust, r1.prod, r1.month),
+
+rawp_data as 
+(select rm1.cust, rm1.prod, rm1.month ,(( rm1.rm_tot * 100)/r1.tot) p   
+from raw_monthly_data rm1, raw_data r1
+where rm1.cust = r1.cust
+and rm1.prod = r1.prod),
+
+raw_up_data as 
+(select rp1.cust, rp1.prod, rp1.month,sum(rp2.p)
+from rawp_data rp1, rawp_data rp2
+where rp1.cust = rp2.cust
+and rp1.prod = rp2.prod
+and rp1.month >= rp2.month
+group by rp1.cust, rp1.prod, rp1.month
+having sum(rp2.p)>=75)
+
+select rd.cust, rd.prod, min(rd.month) 
+from raw_up_data rd
+group by rd.cust, rd.prod

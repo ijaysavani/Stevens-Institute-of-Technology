@@ -1,0 +1,80 @@
+---
+title: "Savani_JayKalyanbhai_HW05"
+output: html_document
+date: '2022-03-23'
+---
+
+
+
+### KNOWLEDGE DISCOVERY AND DATA MINING (CS 513-A) ###
+
+
+
+
+# Course         : CS 513-A
+# First Name     : Jay Kalyanbhai 
+# Last Name      : Savani
+# Id             : 20009207
+rm(list=ls())
+installed.packages()
+
+install.packages("rattle")
+library(rattle)
+
+install.packages('rpart')
+library(rpart)
+
+install.packages('RColorBrewer')
+library(RColorBrewer)
+
+install.packages("rpart.plot")
+library(rpart.plot)
+
+a<-read.csv(file="~/Desktop/breastcancerwisconsin.csv", na.strings = {'?'})
+View(a)
+
+a$Class<-as.factor(a$Class)
+
+levels(a$Class)<-c('benign','malignant')
+
+a<- a[,-1]
+
+split_data <- sample(nrow(a), 0.7 * nrow(a))
+
+train <- a[split_data,]
+
+test <- a[-split_data,]
+
+cart__class<-rpart(Class~.,data=train)
+
+rpart.plot(cart__class)
+
+cart__predict<-predict(cart__class,test, type="class") 
+
+table(Actual=test[,10],CART=cart__predict)
+
+cart__predictt<-predict(cart__class,test)
+
+str(cart__predictt)
+
+cart__predict__cart<-ifelse(cart__predictt[,1]<=.5,'malignant','benign')
+
+table(Actual=test[,10],CART=cart__predict__cart)
+
+wrongcart<-sum(test[,10]!=cart__predict__cart)
+
+carterrate<-wrongcart/length(test[,10])
+
+carterrate
+
+accu_racy<-100-(carterrate*100)
+
+accu_racy
+
+library(rpart.plot)
+
+prp(cart__class)
+
+fancyRpartPlot(cart__class)
+
+

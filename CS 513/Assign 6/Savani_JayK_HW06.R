@@ -1,0 +1,55 @@
+### KNOWLEDGE DISCOVERY AND DATA MINING (CS 513-A) ###
+# Course         : CS 513-A
+# First Name     : Jay Kalyanbhai 
+# Last Name      : Savani
+# Id             : 20009207
+rm(list=ls())
+name<-file.choose()
+a<-read.csv(name)
+View(a)
+summary(a)
+a$F6<-as.integer(a$F6)
+colSums(is.na(a))
+a$Class<-as.factor(a$Class)
+set.seed(123)
+j<-sort(sample(nrow(a),round(.70*nrow(a))))
+trainingset<-a[j,]
+testingset<-a[-j,]
+library(C50)
+C50<-C5.0(Class~.,trainingset)
+print(C50)
+summary(C50)
+plot(C50)
+predict<-predict(C50,testingset,type='class')
+predict
+confusionMatrix<-table(Actual=testingset$Class,C50=predict)
+confusionMatrix
+accuracy<-function(a){sum(diag(a)/sum(nrow(a)))}
+accuracy(confusionMatrix)
+
+
+#Question2
+rm(list=ls())
+name<-file.choose()
+a<-read.csv(name)
+View(a)
+summary(a)
+a$F6<-as.integer(a$F6)
+colSums(is.na(a))
+a$Class<-as.factor(a$Class)
+set.seed(123)
+j<-sort(sample(nrow(a),round(.70*nrow(a))))
+trainingset<-a[j,]
+testingset<-a[-j,]
+install.packages("randomForest")
+library(randomForest)
+rf<-randomForest(Class~.,data=trainingset,importance=TRUE,ntree=1000,na.action=na.exclude)
+rf
+importance(rf)
+varImpPlot(rf)
+Prediction<-predict(rf,testingset)
+conf_matrix<-table(acual=testingset$Class,rf=Prediction)
+conf_matrix
+accuracy<-function(a){sum(diag(a)/sum(nrow(a)))}
+sum(nrow(conf_matrix))
+accuracy(conf_matrix)
