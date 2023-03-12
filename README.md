@@ -3,7 +3,7 @@ Assignments
 Master of Science in Computer Science
 
 
-Here is the list of assignments I have completed/inProcess during my ongoing Master's Program
+Here is the list of assignments I have completed/inProcess during my ongoing Master's Program.
 
 SPRING 2022
 AAI 551 - Engineering Programming: Python
